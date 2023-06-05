@@ -8,8 +8,7 @@ from flask import Flask, request, abort
 
 ##################################################
 # OpenAI API key
-#KEY = "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"
-KEY = "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"
+KEY = "your-api-key"
 ##################################################
 
 app = Flask(__name__)
